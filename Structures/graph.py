@@ -13,7 +13,6 @@ class Graph:
     def __init__(self, points):
         self.points = points
         self.edges = {}
-        self.all_paths = [[]]
 
 
     def add_edge(self,start, end, weight = 0):
@@ -34,22 +33,33 @@ class Graph:
     def points_count(self):
         return len(self.points)
 
-    # def all_paths(self, start, end):
-    #     def search(path, visited):
-    #
-    #         if start == end:
-    #             self.all_paths.append(path)
-    #         for u in graph.edges[start]:
-    #             if u not in visited:
-    #                 path.append(u)
-    #                 visited.append(u)
-    #                 search(path, visited)
-    #                 path.pop()
-    #                 visited.remove(u)
+    def paths(self, start, end_point):
+        all_paths = {}
+
+        def find_path(current_node, path, weight):
+            path = path + current_node
+            if current_node == end_point:
+                all_paths[path] = weight
+                return
+            for edge in self.edges[current_node]:
+                next_node = edge.end
+                weight += edge.weight
+                if next_node not in path:
+                    find_path(next_node, path, weight)
+
+        find_path(start, "", 0)
+
+        return all_paths
+
 
 
     def minimal_distance(self, start, end):
-        pass
+        paths = self.paths(start, end)
+        min_val = min(paths.values())
+        keys = [k for k, v in paths.items() if v == min_val]
+        for key in keys:
+            print(f"минимальная дистанция составляет {paths[key]} км по маршруту {key}")
+
 
 
 graph = Graph(["A", "B", "C", "D"])
@@ -58,10 +68,11 @@ graph.add_edge("A", "B", 2)
 graph.add_edge("C","D", 14)
 graph.add_edge("B","D", 1)
 graph.add_edge("C","B", 8)
-print(graph.edges)
-print(graph.points)
-print(graph.edges_count())
-print(graph.points_count())
+# print(graph.edges["A"])
+# print(graph.points)
+# print(graph.edges_count())
+# print(graph.points_count())
+graph.minimal_distance("A", "D")
 
 
 
